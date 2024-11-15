@@ -201,5 +201,5 @@ README.html
 .exercism
 
 ### Docker ###
-.docker
+.docker/
 docker-compose.yml
