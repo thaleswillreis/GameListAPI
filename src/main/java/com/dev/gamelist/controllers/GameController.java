@@ -15,13 +15,29 @@ import com.dev.gamelist.dto.GameMinDTO;
 import com.dev.gamelist.exceptions.ResourceNotFoundException;
 import com.dev.gamelist.services.GameService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping(value = "/games")
+@Tag(name = "Games", description = "Controlador para buscar jogos do catálogo.")
 public class GameController {
 
 	@Autowired
 	private GameService gameService;
 
+	@Operation(summary = "Busca um jogo", description = "Busca um jogo do catálogo pelo ID do jogo.", parameters = {
+			@Parameter(name = "id", description = "ID do jogo", required = true, example = "1") })
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "A solicitação foi bem-sucedida.", 
+					content = @Content(mediaType = "application/json", schema = @Schema(implementation = GameDTO.class))),
+			@ApiResponse(responseCode = "400", description = "ID inválido fornecido."),
+			@ApiResponse(responseCode = "404", description = "Recurso não encontrado.") })
 	@GetMapping(value = "/{id}")
 	public ResponseEntity<GameDTO> findById(@PathVariable Long id) {
 		if (id == null || id <= 0) {
@@ -35,6 +51,11 @@ public class GameController {
 		}
 	}
 
+	@Operation(summary = "Busca todos os jogos", description = "Retorna todos os jogos de todas as listas do catálogo.")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "A solicitação foi bem-sucedida.", 
+					content = @Content(mediaType = "application/json", schema = @Schema(implementation = GameMinDTO.class))),
+			@ApiResponse(responseCode = "204", description = "Nenhum conteúdo a ser exibido.") })
 	@GetMapping
 	public ResponseEntity<List<GameMinDTO>> findAll() {
 		List<GameMinDTO> games = gameService.findAll();

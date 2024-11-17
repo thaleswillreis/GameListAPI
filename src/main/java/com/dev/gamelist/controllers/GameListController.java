@@ -19,8 +19,16 @@ import com.dev.gamelist.exceptions.ResourceNotFoundException;
 import com.dev.gamelist.services.GameListService;
 import com.dev.gamelist.services.GameService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping(value = "/lists")
+@Tag(name = "Game List", description = "Controlador para buscar e manipular listas de jogos do catálogo.")
 public class GameListController {
 
 	@Autowired
@@ -29,6 +37,11 @@ public class GameListController {
 	@Autowired
 	private GameService gameService;
 
+	@Operation(summary = "Busca todas as listas de jogos", description = "Busca e retorna todas as listas de jogos disponíveis no catálogo.")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Listas de jogos recuperadas com sucesso.", 
+					content = @Content(mediaType = "application/json", schema = @Schema(implementation = GameListDTO.class))),
+			@ApiResponse(responseCode = "204", description = "Nenhuma lista encontrada.") })
 	@GetMapping
 	public ResponseEntity<List<GameListDTO>> findAll() {
 		List<GameListDTO> gameLists = gameListService.findAll();
@@ -38,6 +51,12 @@ public class GameListController {
 		return ResponseEntity.ok(gameLists); // 200 OK
 	}
 
+	@Operation(summary = "Busca jogos de uma lista específica", description = "Retorna todos os jogos associados a uma lista específica identificada pelo ID.")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Jogos recuperados com sucesso.", 
+					content = @Content(mediaType = "application/json", schema = @Schema(implementation = GameMinDTO.class))),
+			@ApiResponse(responseCode = "400", description = "ID inválido fornecido."),
+			@ApiResponse(responseCode = "404", description = "Lista não encontrada.") })
 	@GetMapping(value = "/{listId}/games")
 	public ResponseEntity<List<GameMinDTO>> searchByList(@PathVariable Long listId) {
 		if (listId == null || listId <= 0) {
@@ -54,6 +73,11 @@ public class GameListController {
 		}
 	}
 
+	@Operation(summary = "Reposiciona jogos em uma lista", description = "Reposiciona dinamicamente jogos de uma lista com base nos índices fornecidos.")
+	@ApiResponses(value = { 
+			@ApiResponse(responseCode = "204", description = "Reorganização concluída com sucesso."),
+			@ApiResponse(responseCode = "400", description = "ID inválido ou body malformado."),
+			@ApiResponse(responseCode = "500", description = "Erro interno durante a reorganização.") })
 	@PostMapping(value = "/{listId}/replacement")
 	public ResponseEntity<Void> move(@PathVariable Long listId, @RequestBody ReplacementDTO body) {
 		if (listId == null || listId <= 0) {
