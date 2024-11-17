@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.dev.gamelist.dto.GameDTO;
 import com.dev.gamelist.dto.GameMinDTO;
 import com.dev.gamelist.entities.Game;
+import com.dev.gamelist.exceptions.DatabaseException;
+import com.dev.gamelist.exceptions.ResourceNotFoundException;
 import com.dev.gamelist.projections.GameMinProjection;
 import com.dev.gamelist.repositories.GameRepository;
 
@@ -21,7 +23,8 @@ public class GameService {
 	// retorna um game a partir de um ID
 	@Transactional(readOnly = true)
 	public GameDTO findById(Long id) {
-		Game result = gameRepository.findById(id).get();
+		Game result = gameRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Título de jogo não encontrado para o ID: " + id));
 		return new GameDTO(result);
 	}
 
@@ -32,10 +35,23 @@ public class GameService {
 		return result.stream().map(x -> new GameMinDTO(x)).toList();
 	}
 
-	// retorna os games de uma lista específica a partir do ID da lista
 	@Transactional(readOnly = true)
 	public List<GameMinDTO> findByList(Long listId) {
-		List<GameMinProjection> result = gameRepository.searchByList(listId);
-		return result.stream().map(x -> new GameMinDTO(x)).toList();
+		if (listId == null) {
+			throw new IllegalArgumentException("O ID da lista não pode ser nulo");
+		}
+
+		try {
+			List<GameMinProjection> result = gameRepository.searchByList(listId);
+
+			if (result.isEmpty()) {
+				throw new ResourceNotFoundException("Nenhum jogo encontrado para a lista de ID: " + listId);
+			}
+
+			return result.stream().map(x -> new GameMinDTO(x)).toList();
+
+		} catch (Exception ex) {
+			throw new DatabaseException("Ocorreu um erro ao buscar jogos para o ID da lista: " + listId, ex);
+		}
 	}
 }
