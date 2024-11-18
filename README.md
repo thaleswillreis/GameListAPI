@@ -1,3 +1,5 @@
+[Versão PT-BR](https://github.com/thaleswillreis/GameListAPI/blob/main/LEIAME.md)
+
 # GameListAPI
 
 This is a sample project containing a REST API written using Java 21, Spring Boot 3 framework, Maven dependency manager, PostgreSQL database for the development environment, H2 for the test environment and documentation created with Swagger through the OpenAPI tool.
@@ -284,7 +286,7 @@ The pom.xml file contains the dependency structure used by the Maven dependency 
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
-		
+	
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
@@ -406,7 +408,7 @@ services:
 
 ## Issues encountered
 
-The code may encounter issues when running using different versions of languages ​​and libraries. Make sure that the versions listed in the "Required Dependencies and Versions" item are correctly installed.
+The code may encounter issues when running using different versions of languages and libraries. Make sure that the versions listed in the "Required Dependencies and Versions" item are correctly installed.
 
 ## Contribution
 
